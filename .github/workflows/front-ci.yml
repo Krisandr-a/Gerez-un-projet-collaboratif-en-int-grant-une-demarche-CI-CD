@@ -50,36 +50,46 @@ jobs:
             // load project's base config
             base(config);
       
-            // ensure the junit plugin is loaded even if base config pins plugins array
+            // ensure junit plugin is available even if plugins array is set
             const plugins = config.plugins || [];
-            plugins.push(require('karma-junit-reporter'));
+            try { plugins.push(require('karma-junit-reporter')); } catch (e) {}
             config.plugins = plugins;
       
-            // merge reporters safely
+            // reporters
             const reporters = new Set([...(config.reporters || []), 'junit', 'coverage', 'progress']);
             config.reporters = Array.from(reporters);
       
-            // CI-friendly browser
-            config.browsers = ['ChromeHeadless'];
+            // custom launcher with no-sandbox flags (required on GitHub runners)
+            config.customLaunchers = Object.assign({}, config.customLaunchers, {
+              ChromeHeadlessNoSandbox: {
+                base: 'ChromeHeadless',
+                flags: [
+                  '--no-sandbox',
+                  '--disable-setuid-sandbox',
+                  '--disable-dev-shm-usage',
+                  '--disable-gpu'
+                ]
+              }
+            });
+      
+            // use the custom launcher in CI
+            config.browsers = ['ChromeHeadlessNoSandbox'];
       
             // junit output location
             config.junitReporter = {
               outputDir: 'test-results/junit',
               outputFile: 'results.xml',
-              useBrowserName: false,
+              useBrowserName: false
             };
           };
           EOF
 
-      
-      # Run Karma in headless mode, produce JUnit XML + coverage
       - name: Test (Karma) with coverage
         env:
           CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
         run: |
           npx ng test \
             --no-watch \
-            --browsers=ChromeHeadless \
             --code-coverage \
             --karma-config=karma-ci.conf.js
         continue-on-error: true
