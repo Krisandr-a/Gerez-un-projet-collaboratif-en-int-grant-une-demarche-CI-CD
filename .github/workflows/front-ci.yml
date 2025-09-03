@@ -42,33 +42,46 @@ jobs:
       - name: Build
         run: npm run build --if-present
 
+      # Create a CI-specific karma config that augments your base config
+      - name: Generate karma-ci.conf.js
+        run: |
+          cat > karma-ci.conf.js <<'EOF'
+          const base = require('./karma.conf.js');
+          module.exports = function (config) {
+            base(config);
+            config.set({
+              browsers: ['ChromeHeadless'],
+              reporters: ['progress', 'junit', 'coverage'],
+              junitReporter: {
+                outputDir: 'test-results/junit',
+                outputFile: 'results.xml',
+                useBrowserName: false
+              }
+            });
+          };
+          EOF
+      
       # Run Karma in headless mode, produce JUnit XML + coverage
       - name: Test (Karma) with coverage
         env:
-          # Point Karma to the Chrome installed by the action
           CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
         run: |
-          npm test -- \
-            --watch=false \
+          npx ng test \
+            --no-watch \
             --browsers=ChromeHeadless \
             --code-coverage \
-            --reporters=junit,progress \
-            --junitReporter.outputDir=./test-results/junit \
-            --junitReporter.outputFile=results.xml \
-            --junitReporter.useBrowserName=false
-        continue-on-error: true   # allow reporter to run even if tests fail
+            --karma-config=karma-ci.conf.js
+        continue-on-error: true
 
-      # Nice test summary/annotations in the run UI
       - name: Test Report
         if: always()
         uses: dorny/test-reporter@v1
         with:
           name: Frontend Tests
-          path: front/test-results/junit/*.xml   # path from repo root
+          path: front/test-results/junit/*.xml
           reporter: java-junit
           fail-on-error: true
 
-      # Downloadable coverage (open front/coverage/index.html locally)
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4
@@ -77,7 +90,6 @@ jobs:
           path: front/coverage/**
           if-no-files-found: warn
 
-      # Optional: keep built dist as an artifact
       - name: Upload build dist
         if: always()
         uses: actions/upload-artifact@v4
