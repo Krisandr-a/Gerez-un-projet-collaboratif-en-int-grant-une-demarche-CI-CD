@@ -1,0 +1,87 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Frontend CI (manual)
+
+on:
+  workflow_dispatch: {}   # run only when triggered manually
+
+jobs:
+  node-test-and-build:
+    runs-on: ubuntu-latest
+
+    # All shell steps run from /front
+    defaults:
+      run:
+        working-directory: front
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: 'front/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Add the JUnit reporter (not in your package.json)
+      - name: Add karma-junit-reporter (CI-only)
+        run: npm i -D karma-junit-reporter
+
+      # Install Chrome for Karma's ChromeHeadless
+      - name: Setup Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+
+      # Build (optional)
+      - name: Build
+        run: npm run build --if-present
+
+      # Run Karma in headless mode, produce JUnit XML + coverage
+      - name: Test (Karma) with coverage
+        env:
+          # Point Karma to the Chrome installed by the action
+          CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
+        run: |
+          npm test -- \
+            --watch=false \
+            --browsers=ChromeHeadless \
+            --code-coverage \
+            --reporters=junit,progress \
+            --junitReporter.outputDir=./test-results/junit \
+            --junitReporter.outputFile=results.xml \
+            --junitReporter.useBrowserName=false
+        continue-on-error: true   # allow reporter to run even if tests fail
+
+      # Nice test summary/annotations in the run UI
+      - name: Test Report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Frontend Tests
+          path: front/test-results/junit/*.xml   # path from repo root
+          reporter: java-junit
+          fail-on-error: true
+
+      # Downloadable coverage (open front/coverage/index.html locally)
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: front/coverage/**
+          if-no-files-found: warn
+
+      # Optional: keep built dist as an artifact
+      - name: Upload build dist
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: front/dist/**
+          if-no-files-found: warn
