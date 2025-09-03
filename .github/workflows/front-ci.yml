@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: Use Node.js 20.x
         uses: actions/setup-node@v4
@@ -118,3 +120,8 @@ jobs:
           name: frontend-dist
           path: front/dist/**
           if-no-files-found: warn
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
