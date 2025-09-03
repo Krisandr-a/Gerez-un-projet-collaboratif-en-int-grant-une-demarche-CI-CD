@@ -42,24 +42,35 @@ jobs:
       - name: Build
         run: npm run build --if-present
 
-      # Create a CI-specific karma config that augments your base config
       - name: Generate karma-ci.conf.js
         run: |
           cat > karma-ci.conf.js <<'EOF'
           const base = require('./karma.conf.js');
           module.exports = function (config) {
+            // load project's base config
             base(config);
-            config.set({
-              browsers: ['ChromeHeadless'],
-              reporters: ['progress', 'junit', 'coverage'],
-              junitReporter: {
-                outputDir: 'test-results/junit',
-                outputFile: 'results.xml',
-                useBrowserName: false
-              }
-            });
+      
+            // ensure the junit plugin is loaded even if base config pins plugins array
+            const plugins = config.plugins || [];
+            plugins.push(require('karma-junit-reporter'));
+            config.plugins = plugins;
+      
+            // merge reporters safely
+            const reporters = new Set([...(config.reporters || []), 'junit', 'coverage', 'progress']);
+            config.reporters = Array.from(reporters);
+      
+            // CI-friendly browser
+            config.browsers = ['ChromeHeadless'];
+      
+            // junit output location
+            config.junitReporter = {
+              outputDir: 'test-results/junit',
+              outputFile: 'results.xml',
+              useBrowserName: false,
+            };
           };
           EOF
+
       
       # Run Karma in headless mode, produce JUnit XML + coverage
       - name: Test (Karma) with coverage
