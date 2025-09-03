@@ -74,9 +74,7 @@ jobs:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
-        mvn -B -ntp org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-          -Dsonar.host.url=https://your.sonarqube.server \
-          -Dsonar.projectKey=your-project-key      
+        mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Krisandr-a_Gerez-un-projet-collaboratif-en-int-grant-une-demarche-CI-CD      
 
    # Parse Surefire JUnit XML reports and create a rich summary + annotations
     - name: Surefire test report
