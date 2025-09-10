@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java CI with Maven
+name: Backend CI
 
 on:
   workflow_dispatch: {}   # run only when triggered manually
@@ -19,7 +19,7 @@ on:
 
 jobs:
 
-  test-and-coverage:
+  backend-ci:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -53,8 +53,6 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
 
-    # Run build+tests+coverage but DON'T stop the job on test failure,
-    # so the reporter can still parse and annotate results.
     - name: Build, test, and generate JaCoCo
       run: |
         mvn -B -ntp clean verify \
@@ -69,7 +67,6 @@ jobs:
       run: |
         mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar      
 
-   # Parse Surefire JUnit XML reports and create a rich summary + annotations
     - name: Surefire test report
       uses: dorny/test-reporter@v1
       if: always()
@@ -79,7 +76,6 @@ jobs:
         reporter: java-junit
         fail-on-error: true   # fail the job if tests failed
 
-    # (Optional) Upload HTML coverage so you can download & view it
     - name: Upload JaCoCo HTML report
       if: always()
       uses: actions/upload-artifact@v4
@@ -97,7 +93,7 @@ jobs:
     - name: Build and push backend image
       uses: docker/build-push-action@v6
       with:
-        context: ./back           # path is from repo root (defaults.run doesn't affect actions)
+        context: ./back           
         file: ./back/Dockerfile
         push: true
         tags: |
