@@ -16,6 +16,8 @@
 	<properties>
 		<java.version>11</java.version>
 		<sonar.organization>krisandr-a</sonar.organization>
+        <sonar.projectKey>krisandr-a_Gerez-un-projet-collaboratif-en-int-grant-une-demarche-CI-CD-back</sonar.projectKey>
+        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 	<dependencies>
 		<dependency>
