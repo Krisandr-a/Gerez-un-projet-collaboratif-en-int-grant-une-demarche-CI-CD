@@ -1,16 +1,15 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-name: Frontend CI (manual)
+name: Frontend CI
 
 on:
   workflow_dispatch: {}   # run only when triggered manually
 
 jobs:
-  node-test-and-build:
+  frontend-ci:
     runs-on: ubuntu-latest
 
-    # All shell steps run from /front
     defaults:
       run:
         working-directory: front
@@ -40,7 +39,7 @@ jobs:
         id: chrome
         uses: browser-actions/setup-chrome@v1
 
-      # Build (optional)
+      # Build
       - name: Build
         run: npm run build --if-present
 
@@ -96,7 +95,7 @@ jobs:
             --karma-config=karma-ci.conf.js
         continue-on-error: true
 
-      - name: Test Report
+      - name: Test report
         if: always()
         uses: dorny/test-reporter@v1
         with:
@@ -121,7 +120,7 @@ jobs:
           path: front/dist/**
           if-no-files-found: warn
 
-      - name: SonarQube Scan
+      - name: SonarQube scan
         uses: SonarSource/sonarqube-scan-action@v5
         with:
           projectBaseDir: front
@@ -134,7 +133,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push (latest only)
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: ./front
