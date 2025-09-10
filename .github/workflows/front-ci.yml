@@ -93,10 +93,8 @@ jobs:
             --no-watch \
             --code-coverage \
             --karma-config=karma-ci.conf.js
-        continue-on-error: true
-
+    
       - name: Test report
-        if: always()
         uses: dorny/test-reporter@v1
         with:
           name: Frontend Tests
@@ -105,7 +103,6 @@ jobs:
           fail-on-error: true
 
       - name: Upload coverage report
-        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: frontend-coverage
@@ -113,7 +110,6 @@ jobs:
           if-no-files-found: warn
 
       - name: Upload build dist
-        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: frontend-dist
