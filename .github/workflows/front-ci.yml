@@ -98,6 +98,11 @@ jobs:
             --code-coverage \
             --karma-config=karma-ci.conf.js
     
+      - name: Debug JUnit files (frontend)
+        run: |
+          echo "Expect to find XML only in front/test-results/junit/"
+          ls -la front/test-results/junit || true
+      
       - name: Test report
         uses: dorny/test-reporter@v1
         with:
