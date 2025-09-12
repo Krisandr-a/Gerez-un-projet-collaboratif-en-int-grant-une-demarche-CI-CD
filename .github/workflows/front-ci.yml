@@ -3,12 +3,25 @@
 
 name: Frontend CI
 
+#on:
+#  pull_request:
+#    branches: [ "main" ]
+#  push:
+#    branches: [ "main" ]
+#  workflow_dispatch: {}   # triggered manually
+
 on:
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'front/**'
+      - '.github/workflows/front-ci.yml'
   push:
     branches: [ "main" ]
-  workflow_dispatch: {}   # triggered manually
+    paths:
+      - 'front/**'
+      - '.github/workflows/front-ci.yml'
+  workflow_dispatch: {}
 
 jobs:
   frontend-ci:

@@ -8,12 +8,26 @@
 
 name: Backend CI
 
+#on:
+#  pull_request:
+#    branches: [ "main" ]
+#  push:
+#    branches: [ "main" ]
+#  workflow_dispatch: {}   # triggered manually
+
+#testing
 on:
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'back/**'
+      - '.github/workflows/back-ci.yml'
   push:
     branches: [ "main" ]
-  workflow_dispatch: {}   # triggered manually
+    paths:
+      - 'back/**'
+      - '.github/workflows/back-ci.yml'
+  workflow_dispatch: {}
 
 jobs:
 
