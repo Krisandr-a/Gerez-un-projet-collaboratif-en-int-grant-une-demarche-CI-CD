@@ -63,6 +63,11 @@ jobs:
       run: |
         mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar      
 
+    - name: Debug JUnit files (backend)
+      run: |
+        echo "Expect Surefire XML under back/**/target/surefire-reports/"
+        ls -R back/**/target/surefire-reports || true
+    
     - name: Surefire test report
       uses: dorny/test-reporter@v1
       with:
