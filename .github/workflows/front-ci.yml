@@ -10,6 +10,7 @@ name: Frontend CI
 #    branches: [ "main" ]
 #  workflow_dispatch: {}   # triggered manually
 
+#testing scope
 on:
   pull_request:
     branches: [ "main" ]
