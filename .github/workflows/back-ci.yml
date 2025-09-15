@@ -30,6 +30,7 @@ on:
 
 # to display test coverage report when manually triggered
 permissions:
+  contents: read
   checks: write  
   
 jobs:
