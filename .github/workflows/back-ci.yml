@@ -8,13 +8,6 @@
 
 name: Backend CI
 
-#on:
-#  pull_request:
-#    branches: [ "main" ]
-#  push:
-#    branches: [ "main" ]
-#  workflow_dispatch: {}   # triggered manually
-
 on:
   pull_request:
     branches: [ "main" ]
@@ -26,13 +19,7 @@ on:
     paths:
       - 'back/**'
       - '.github/workflows/back-ci.yml'
-  workflow_dispatch: {}
 
-# to display test coverage report when manually triggered
-permissions:
-  contents: read
-  checks: write  
-  
 jobs:
 
   backend-ci:
@@ -74,7 +61,6 @@ jobs:
         mvn -B -ntp clean verify \
           org.jacoco:jacoco-maven-plugin:prepare-agent \
           org.jacoco:jacoco-maven-plugin:report
-        continue-on-error: true
         
     - name: SonarQube analysis
       env:
@@ -82,16 +68,11 @@ jobs:
       run: |
         mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar      
 
-    - name: Debug JUnit files (backend)
-      run: |
-        echo "Expect Surefire XML under target/surefire-reports/ (working dir = back)"
-        ls -R target/surefire-reports || true
-
     - name: Surefire test report
       uses: dorny/test-reporter@v1
       with:
         name: Maven Tests
-        path: back/**/target/surefire-reports/*.xml   # path is from repo root
+        path: back/**/target/surefire-reports/*.xml   
         reporter: java-junit
         fail-on-error: true   # fail the job if tests failed
 
