@@ -15,7 +15,6 @@ name: Backend CI
 #    branches: [ "main" ]
 #  workflow_dispatch: {}   # triggered manually
 
-#testing 2
 on:
   pull_request:
     branches: [ "main" ]
