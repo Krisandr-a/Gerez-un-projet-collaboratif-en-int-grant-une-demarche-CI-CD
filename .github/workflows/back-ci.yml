@@ -75,8 +75,7 @@ jobs:
           org.jacoco:jacoco-maven-plugin:prepare-agent \
           org.jacoco:jacoco-maven-plugin:report
         continue-on-error: true
-        #testing to see if continue has an effect on manual trigger
-      
+        
     - name: SonarQube analysis
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
