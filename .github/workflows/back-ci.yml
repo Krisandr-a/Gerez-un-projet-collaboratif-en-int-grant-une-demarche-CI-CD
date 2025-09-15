@@ -28,6 +28,10 @@ on:
       - '.github/workflows/back-ci.yml'
   workflow_dispatch: {}
 
+# to display test coverage report when manually triggered
+permissions:
+  checks: write  
+  
 jobs:
 
   backend-ci:
