@@ -9,7 +9,7 @@ import { JokesService } from './services/jokes.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-// testing
+// testing front
   public joke$: Observable<Joke | null> = this.jokesService.joke$();
 
   constructor(private jokesService: JokesService) {
